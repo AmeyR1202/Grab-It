@@ -1,4 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
+import 'package:grab_it/features/auth/data/datasources/auth_remot_datasource_impl.dart';
+import 'package:grab_it/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:grab_it/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:grab_it/features/auth/domain/repositories/auth_repository.dart';
 import 'package:grab_it/features/auth/domain/usecases/send_otp_usecase.dart';
@@ -20,8 +24,10 @@ Future<void> init() async {
   // repository
   sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(sl()));
 
-  // datasources
-  // sl.registerLazySingleton<AuthRemoteDatasource>(
-  //   () => AuthRemoteDatasourceImpl(firebaseAuth: sl(), firestore: sl()),
-  // );
+  sl.registerLazySingleton(() => FirebaseAuth.instance);
+  sl.registerLazySingleton(() => FirebaseFirestore.instance);
+  // Datasources
+  sl.registerLazySingleton<AuthRemoteDatasource>(
+    () => AuthRemotDatasourceImpl(firebaseAuth: sl(), firestore: sl()),
+  );
 }

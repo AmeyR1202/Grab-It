@@ -14,7 +14,7 @@ class AuthLoading extends AuthState {}
 
 class AuthOtpSent extends AuthState {
   final String verificationId;
-  AuthOtpSent({required this.verificationId});
+  const AuthOtpSent({required this.verificationId});
 
   @override
   List<Object> get props => [verificationId];

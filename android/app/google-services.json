@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "195512524145",
+    "project_id": "grabit-vendor-app-2026",
+    "storage_bucket": "grabit-vendor-app-2026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:195512524145:android:aa2e3209790269c879ead0",
+        "android_client_info": {
+          "package_name": "com.example.grab_it"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEe_m-SvPDR5fGqJBMFrYHDn7YoSnu-a4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

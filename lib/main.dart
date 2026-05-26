@@ -1,8 +1,20 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:grab_it/firebase_options.dart';
+import 'package:grab_it/injection_container.dart' as di;
 import 'core/theme/app_theme.dart';
 
-void main() {
+void main() async {
+  // Ensuring Flutter bindings are ready before using Firebase
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // initialise firebase with generated options
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Getit init
+  await di.init();
+
   runApp(const MyApp());
 }
 
