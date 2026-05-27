@@ -21,6 +21,7 @@ class AuthRemotDatasourceImpl implements AuthRemoteDatasource {
     final completer = Completer<String>();
 
     await firebaseAuth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) {},
       verificationFailed: (FirebaseAuthException e) {
         completer.completeError(

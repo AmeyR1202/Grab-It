@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grab_it/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:grab_it/features/auth/presentation/pages/login_page.dart';
 import 'package:grab_it/firebase_options.dart';
 import 'package:grab_it/injection_container.dart' as di;
 import 'core/theme/app_theme.dart';
@@ -32,26 +35,12 @@ class MyApp extends StatelessWidget {
           title: 'Grab It',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-          home: const HomePage(),
+          home: BlocProvider(
+            create: (context) => di.sl<AuthBloc>(),
+            child: const LoginPage(),
+          ),
         );
       },
-    );
-  }
-}
-
-// 2. Create the new Widget down here
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(
-          'GrabIt Foundation Set!',
-          style: TextStyle(fontSize: 24.sp),
-        ),
-      ),
     );
   }
 }
