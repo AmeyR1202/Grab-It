@@ -57,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
                   borderRadius: BorderRadius.circular(16.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -115,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
                               if (phone.isNotEmpty && !phone.startsWith('+')) {
                                 phone = '+91$phone';
                               }
-                              
+
                               if (phone.isNotEmpty) {
                                 context.read<AuthBloc>().add(
                                   AuthSendOtpEvent(phoneNumber: phone),

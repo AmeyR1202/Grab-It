@@ -2,10 +2,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grab_it/core/routes/app_router.dart';
 import 'package:grab_it/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:grab_it/features/auth/presentation/pages/login_page.dart';
 import 'package:grab_it/firebase_options.dart';
-import 'package:grab_it/injection_container.dart' as di;
+import 'package:grab_it/injection_container.dart';
 import 'core/theme/app_theme.dart';
 
 void main() async {
@@ -16,9 +16,14 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Getit init
-  await di.init();
+  await initDependencies();
 
-  runApp(const MyApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [BlocProvider(create: (_) => sl<AuthBloc>())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -31,14 +36,11 @@ class MyApp extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return MaterialApp(
+        return MaterialApp.router(
           title: 'Grab It',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-          home: BlocProvider(
-            create: (context) => di.sl<AuthBloc>(),
-            child: const LoginPage(),
-          ),
+          routerConfig: router,
         );
       },
     );
