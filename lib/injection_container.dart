@@ -11,7 +11,7 @@ import 'package:grab_it/features/auth/presentation/bloc/auth_bloc.dart';
 
 final sl = GetIt.instance;
 
-Future<void> init() async {
+Future<void> initDependencies() async {
   // BLoC
   sl.registerFactory(
     () => AuthBloc(sendOtpUsecase: sl(), verifyOTPUseCase: sl()),
