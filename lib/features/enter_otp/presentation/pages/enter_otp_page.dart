@@ -1,12 +1,19 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
+import 'package:grab_it/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:grab_it/features/auth/presentation/bloc/auth_event.dart';
 import 'package:pinput/pinput.dart';
 
 class EnterOtpPage extends StatefulWidget {
-  const EnterOtpPage({super.key});
+  final String verificationId;
+  final bool userExists;
+  const EnterOtpPage({
+    super.key,
+    required this.verificationId,
+    required this.userExists,
+  });
 
   @override
   State<EnterOtpPage> createState() => _EnterOtpPageState();
@@ -86,7 +93,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
               SizedBox(height: 10.h),
 
               Text(
-                '+91 9876543210',
+                '+91 7820972247',
                 style: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.w600),
               ),
 
@@ -107,7 +114,18 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
                 //         AuthSendOtpEvent(phoneNumber: fullPhoneNumber),
                 //       )
                 //     : null,
-                onPressed: () => context.go(''),
+                onPressed: _otpController.text.trim().length == 6
+                    ? () => context.read<AuthBloc>().add(
+                        AuthVerifyOtpEvent(
+                          verificationId: widget.verificationId,
+                          smsCode: _otpController.text.trim(),
+                          userExists: widget.userExists,
+                          name: '',
+                          phoneNumber: '',
+                          address: '',
+                        ),
+                      )
+                    : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromRGBO(30, 144, 255, 198),
                   disabledBackgroundColor: const Color.fromARGB(
@@ -125,7 +143,7 @@ class _EnterOtpPageState extends State<EnterOtpPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Send OTP',
+                      'Verify OTP',
                       style: TextStyle(
                         fontSize: 15.sp,
                         fontWeight: FontWeight.w500,

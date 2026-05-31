@@ -1,27 +1,112 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:grab_it/core/notifiers/auth_notifier.dart';
+import 'package:grab_it/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:grab_it/features/auth/presentation/bloc/auth_state.dart';
+import 'package:grab_it/features/splash/presentation/pages/splash_page.dart';
+import 'package:grab_it/features/welcome/presentation/pages/welcome_page.dart';
 import 'package:grab_it/features/enter_number/presentation/pages/enter_number_page.dart';
 import 'package:grab_it/features/enter_otp/presentation/pages/enter_otp_page.dart';
-import 'package:grab_it/features/welcome/presentation/pages/welcome_page.dart';
-import 'package:grab_it/features/splash/presentation/pages/splash_page.dart';
+import 'package:grab_it/features/auth/presentation/pages/profile_setup_page.dart';
+import 'package:grab_it/features/home/presentation/pages/home_page.dart';
+import 'package:grab_it/features/merchant/presentation/pages/merchant_dashboard_page.dart';
 
-final authNotifier = AuthNotifier();
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
 
-final GoRouter router = GoRouter(
-  initialLocation: '/welcome',
+  late final StreamSubscription<dynamic> _subscription;
 
-  refreshListenable: authNotifier, // listen to user status of sign in or out
-  // TODO: write redeirect logic here if user -== null then take to loginpage or home if logged in
-  routes: [
-    GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
-    GoRoute(path: '/welcome', builder: (context, state) => const WelcomePage()),
-    GoRoute(
-      path: '/enter-number',
-      builder: (context, state) => const EnterNumberPage(),
-    ),
-    GoRoute(
-      path: '/enter-otp',
-      builder: (context, state) => const EnterOtpPage(),
-    ),
-  ],
-);
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
+GoRouter createRouter(AuthBloc authBloc) {
+  return GoRouter(
+    initialLocation: '/splash',
+
+    refreshListenable: GoRouterRefreshStream(authBloc.stream),
+
+    redirect: (context, state) {
+      final authState = authBloc.state;
+
+      final location = state.matchedLocation;
+
+      final isAuthRoute =
+          location == '/welcome' ||
+          location == '/enter-number' ||
+          location == '/enter-otp';
+
+      // User not authenticated
+      if (authState is AuthInitial || authState is AuthFailureState) {
+        return isAuthRoute ? null : '/welcome';
+      }
+
+      // OTP sent successfully
+      if (authState is AuthOtpSent) {
+        return location == '/enter-otp' ? null : '/enter-otp';
+      }
+
+      // New user
+      if (authState is AuthUserNewState) {
+        return location == '/profile-setup' ? null : '/profile-setup';
+      }
+
+      // Existing user
+      if (authState is AuthUserExistsState) {
+        final target = authState.user.role == 'owner'
+            ? '/merchant-dashboard'
+            : '/home';
+
+        return location == target ? null : target;
+      }
+
+      return null;
+    },
+
+    routes: [
+      GoRoute(path: '/splash', builder: (context, state) => const SplashPage()),
+
+      GoRoute(
+        path: '/welcome',
+        builder: (context, state) => const WelcomePage(),
+      ),
+
+      GoRoute(
+        path: '/enter-number',
+        builder: (context, state) => const EnterNumberPage(),
+      ),
+
+      GoRoute(
+        path: '/enter-otp',
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>? ?? {};
+
+          return EnterOtpPage(
+            verificationId: extra['verificationId'] as String? ?? '',
+            userExists: extra['userExists'] as bool? ?? false,
+          );
+        },
+      ),
+
+      GoRoute(
+        path: '/profile-setup',
+        builder: (context, state) => const ProfileSetupPage(),
+      ),
+
+      GoRoute(
+        path: '/home',
+        builder: (context, state) => const HomePage(),
+      ),
+
+      GoRoute(
+        path: '/merchant-dashboard',
+        builder: (context, state) => const MerchantDashboardPage(),
+      ),
+    ],
+  );
+}

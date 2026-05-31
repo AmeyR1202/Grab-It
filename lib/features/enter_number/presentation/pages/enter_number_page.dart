@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:go_router/go_router.dart';
 import 'package:grab_it/core/theme/app_colors.dart';
+import 'package:grab_it/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:grab_it/features/auth/presentation/bloc/auth_event.dart';
 
 class EnterNumberPage extends StatefulWidget {
   const EnterNumberPage({super.key});
@@ -136,12 +138,11 @@ class _EnterNumberPageState extends State<EnterNumberPage> {
                 width: double.infinity,
                 height: 52.h,
                 child: ElevatedButton(
-                  // onPressed: _phoneController.text.length == 10
-                  //     ? () => context.read<AuthBloc>().add(
-                  //         AuthSendOtpEvent(phoneNumber: fullPhoneNumber),
-                  //       )
-                  //     : null,
-                  onPressed: () => context.go('/enter-otp'),
+                  onPressed: _phoneController.text.length == 10
+                      ? () => context.read<AuthBloc>().add(
+                          AuthSendOtpEvent(phoneNumber: fullPhoneNumber),
+                        )
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color.fromRGBO(30, 144, 255, 198),
                     disabledBackgroundColor: const Color.fromARGB(

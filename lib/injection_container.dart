@@ -5,6 +5,7 @@ import 'package:grab_it/features/auth/data/datasources/auth_remot_datasource_imp
 import 'package:grab_it/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:grab_it/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:grab_it/features/auth/domain/repositories/auth_repository.dart';
+import 'package:grab_it/features/auth/domain/usecases/check_user_exists_usecase.dart';
 import 'package:grab_it/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:grab_it/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:grab_it/features/auth/presentation/bloc/auth_bloc.dart';
@@ -14,12 +15,17 @@ final sl = GetIt.instance;
 Future<void> initDependencies() async {
   // BLoC
   sl.registerFactory(
-    () => AuthBloc(sendOtpUsecase: sl(), verifyOTPUseCase: sl()),
+    () => AuthBloc(
+      sendOtpUsecase: sl(),
+      verifyOTPUseCase: sl(),
+      checkUserExistsUseCase: sl(),
+    ),
   );
 
   // usecases
   sl.registerLazySingleton(() => SendOtpUsecase(sl()));
   sl.registerLazySingleton(() => VerifyOTPUseCase(sl()));
+  sl.registerLazySingleton(() => CheckUserExistsUseCase(sl()));
 
   // repository
   sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(sl()));

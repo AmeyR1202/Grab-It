@@ -20,6 +20,7 @@ class AuthVerifyOtpEvent extends AuthEvent {
   final String smsCode;
   final String name;
   final String phoneNumber;
+  final bool userExists;
   final String address;
 
   const AuthVerifyOtpEvent({
@@ -28,6 +29,7 @@ class AuthVerifyOtpEvent extends AuthEvent {
     required this.name,
     required this.phoneNumber,
     required this.address,
+    required this.userExists,
   });
 
   @override
@@ -37,5 +39,6 @@ class AuthVerifyOtpEvent extends AuthEvent {
     name,
     phoneNumber,
     address,
+    userExists,
   ];
 }

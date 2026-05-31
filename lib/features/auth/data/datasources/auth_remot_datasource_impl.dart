@@ -90,4 +90,18 @@ class AuthRemotDatasourceImpl implements AuthRemoteDatasource {
       throw ServerException(e.toString());
     }
   }
+
+  @override
+  Future<bool> checkUserExists(String phoneNumber) async {
+    try {
+      final snapshot = await firestore
+          .collection('users')
+          .where('mobileNumber', isEqualTo: phoneNumber)
+          .limit(1)
+          .get();
+      return snapshot.docs.isNotEmpty;
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
 }

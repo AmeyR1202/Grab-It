@@ -14,4 +14,6 @@ abstract interface class AuthRepository {
     required String phoneNumber,
     required String address,
   });
+
+  Future<Either<Failures, bool>> checkUserExists(String phoneNumber);
 }

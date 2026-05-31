@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:grab_it/core/routes/app_router.dart';
@@ -7,6 +8,8 @@ import 'package:grab_it/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:grab_it/firebase_options.dart';
 import 'package:grab_it/injection_container.dart';
 import 'core/theme/app_theme.dart';
+
+late final GoRouter appRouter;
 
 void main() async {
   // Ensuring Flutter bindings are ready before using Firebase
@@ -17,6 +20,8 @@ void main() async {
 
   // Getit init
   await initDependencies();
+
+  appRouter = createRouter(sl<AuthBloc>());
 
   runApp(
     MultiBlocProvider(
@@ -40,7 +45,7 @@ class MyApp extends StatelessWidget {
           title: 'Grab It',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-          routerConfig: router,
+          routerConfig: appRouter,
         );
       },
     );

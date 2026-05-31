@@ -11,4 +11,5 @@ abstract interface class AuthRemoteDatasource {
     required String phoneNumber,
     required String address,
   });
+  Future<bool> checkUserExists(String phoneNumber);
 }
