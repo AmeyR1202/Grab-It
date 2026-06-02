@@ -42,3 +42,20 @@ class AuthVerifyOtpEvent extends AuthEvent {
     userExists,
   ];
 }
+
+class AuthSaveProfileEvent extends AuthEvent {
+  final String uid;
+  final String name;
+  final String phoneNumber;
+  final String address;
+
+  const AuthSaveProfileEvent({
+    required this.uid,
+    required this.name,
+    required this.phoneNumber,
+    required this.address,
+  });
+
+  @override
+  List<Object> get props => [uid, name, phoneNumber, address];
+}

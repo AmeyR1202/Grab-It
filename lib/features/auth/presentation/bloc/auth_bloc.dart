@@ -1,7 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:grab_it/core/errors/failures.dart';
+import 'package:grab_it/features/auth/domain/entities/user_entity.dart';
 import 'package:grab_it/features/auth/domain/usecases/check_user_exists_usecase.dart';
+import 'package:grab_it/features/auth/domain/usecases/save_user_profile_usecase.dart';
 import 'package:grab_it/features/auth/domain/usecases/send_otp_usecase.dart';
 import 'package:grab_it/features/auth/domain/usecases/verify_otp_usecase.dart';
 import 'package:grab_it/features/auth/presentation/bloc/auth_event.dart';
@@ -11,14 +13,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SendOtpUsecase sendOtpUsecase;
   final VerifyOTPUseCase verifyOTPUseCase;
   final CheckUserExistsUseCase checkUserExistsUseCase;
+  final SaveUserProfileUsecase saveUserProfileUsecase;
 
   AuthBloc({
     required this.sendOtpUsecase,
     required this.verifyOTPUseCase,
     required this.checkUserExistsUseCase,
+    required this.saveUserProfileUsecase,
   }) : super(AuthInitial()) {
     on<AuthSendOtpEvent>(_sendOtp);
     on<AuthVerifyOtpEvent>(_verifyOtp);
+    on<AuthSaveProfileEvent>(_saveProfile);
   }
 
   Future<void> _sendOtp(AuthSendOtpEvent event, Emitter<AuthState> emit) async {
@@ -37,7 +42,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       (verificationId) {
         existsResult.fold(
           (failure) => emit(AuthFailureState(message: failure.message)),
-          (userExists) => emit(AuthOtpSent(verificationId: verificationId, userExists: userExists)),
+          (userExists) => emit(
+            AuthOtpSent(verificationId: verificationId, userExists: userExists),
+          ),
         );
       },
     );
@@ -58,15 +65,36 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       ),
     );
 
+    result.fold((failure) => emit(AuthFailureState(message: failure.message)), (
+      user,
+    ) {
+      if (event.userExists) {
+        emit(AuthUserExistsState(user: user));
+      } else {
+        emit(AuthUserNewState(uid: user.id, mobileNumber: user.mobileNumber));
+      }
+    });
+  }
+
+  Future<void> _saveProfile(
+    AuthSaveProfileEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+
+    final userEntity = UserEntity(
+      id: event.uid,
+      name: event.name,
+      mobileNumber: event.phoneNumber,
+      address: event.address,
+      role: 'user',
+    );
+
+    final result = await saveUserProfileUsecase(userEntity);
+
     result.fold(
       (failure) => emit(AuthFailureState(message: failure.message)),
-      (user) {
-        if (event.userExists) {
-          emit(AuthUserExistsState(user: user));
-        } else {
-          emit(AuthUserNewState(uid: user.id));
-        }
-      },
+      (user) => emit(AuthUserExistsState(user: user)),
     );
   }
 }

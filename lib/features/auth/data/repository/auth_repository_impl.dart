@@ -4,6 +4,7 @@ import 'package:grab_it/core/errors/failures.dart';
 import 'package:grab_it/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:grab_it/features/auth/domain/entities/user_entity.dart';
 import 'package:grab_it/features/auth/domain/repositories/auth_repository.dart';
+import 'package:grab_it/features/auth/data/models/user_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDatasource remoteDatasource;
@@ -13,7 +14,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failures, String>> sendOTP(String phoneNumber) async {
     try {
       final verificationId = await remoteDatasource.sendOTP(phoneNumber);
-      return right(verificationId);
+      return Right(verificationId);
     } on ServerException catch (e) {
       return Left(ServerFailure(e.message));
     } catch (e) {
@@ -53,6 +54,25 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(exists);
     } on ServerException {
       return Left(ServerFailure('Failed to check user existence'));
+    }
+  }
+
+  @override
+  Future<Either<Failures, UserEntity>> saveUserProfile(UserEntity user) async {
+    try {
+      final userModel = UserModel(
+        id: user.id,
+        name: user.name,
+        mobileNumber: user.mobileNumber,
+        address: user.address,
+        role: user.role,
+      );
+      final saveUser = await remoteDatasource.saveUserProfile(userModel);
+      return Right(saveUser.toEntity());
+    } on ServerException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

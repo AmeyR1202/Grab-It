@@ -40,7 +40,11 @@ class AuthFailureState extends AuthState {
 //  state for a completely new user
 class AuthUserNewState extends AuthState {
   final String uid; // fb auth id
-  const AuthUserNewState({required this.uid});
+  final String mobileNumber;
+  const AuthUserNewState({required this.uid, required this.mobileNumber});
+  
+  @override
+  List<Object> get props => [uid, mobileNumber];
 }
 
 //  state for an existing, fully verified user

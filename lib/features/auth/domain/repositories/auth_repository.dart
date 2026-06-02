@@ -16,4 +16,6 @@ abstract interface class AuthRepository {
   });
 
   Future<Either<Failures, bool>> checkUserExists(String phoneNumber);
+
+  Future<Either<Failures, UserEntity>> saveUserProfile(UserEntity user);
 }

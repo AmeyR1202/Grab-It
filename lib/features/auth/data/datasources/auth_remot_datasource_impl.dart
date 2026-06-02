@@ -104,4 +104,15 @@ class AuthRemotDatasourceImpl implements AuthRemoteDatasource {
       throw ServerException(e.toString());
     }
   }
+
+  @override
+  Future<UserModel> saveUserProfile(UserModel user) async {
+    try {
+      // Save the user data to the 'users' collection using their UID as the document ID
+      await firestore.collection('users').doc(user.id).set(user.toJson());
+      return user;
+    } catch (e) {
+      throw ServerException(e.toString());
+    }
+  }
 }

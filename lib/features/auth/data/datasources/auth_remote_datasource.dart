@@ -12,4 +12,5 @@ abstract interface class AuthRemoteDatasource {
     required String address,
   });
   Future<bool> checkUserExists(String phoneNumber);
+  Future<UserModel> saveUserProfile(UserModel user);
 }
