@@ -36,33 +36,22 @@ GoRouter createRouter(AuthBloc authBloc) {
 
       final location = state.matchedLocation;
 
+      // Global Route Guards
       final isAuthRoute =
           location == '/welcome' ||
           location == '/enter-number' ||
-          location == '/enter-otp';
+          location == '/enter-otp' ||
+          location == '/profile-setup';
 
-      // User not authenticated
+      // 1. Unauthenticated users should be blocked from accessing protected routes
       if (authState is AuthInitial || authState is AuthFailureState) {
         return isAuthRoute ? null : '/welcome';
       }
 
-      // OTP sent successfully
-      if (authState is AuthOtpSent) {
-        return location == '/enter-otp' ? null : '/enter-otp';
-      }
-
-      // New user
-      if (authState is AuthUserNewState) {
-        return location == '/profile-setup' ? null : '/profile-setup';
-      }
-
-      // Existing user
+      // 2. Authenticated users should not be able to go backwards to the login screens
       if (authState is AuthUserExistsState) {
-        final target = authState.user.role == 'owner'
-            ? '/merchant-dashboard'
-            : '/home';
-
-        return location == target ? null : target;
+        final target = authState.user.role == 'owner' ? '/merchant-dashboard' : '/home';
+        return isAuthRoute ? target : null;
       }
 
       return null;
@@ -89,6 +78,7 @@ GoRouter createRouter(AuthBloc authBloc) {
           return EnterOtpPage(
             verificationId: extra['verificationId'] as String? ?? '',
             userExists: extra['userExists'] as bool? ?? false,
+            phoneNumber: extra['phoneNumber'] as String? ?? '',
           );
         },
       ),

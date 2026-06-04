@@ -19,19 +19,35 @@ class AuthRemotDatasourceImpl implements AuthRemoteDatasource {
     // using Completer to turn Firebase's callback functions into a Future
     final completer = Completer<String>();
 
-    await firebaseAuth.verifyPhoneNumber(
+    firebaseAuth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
-      verificationCompleted: (PhoneAuthCredential credential) {},
+      verificationCompleted: (PhoneAuthCredential credential) {
+        // When using test numbers, Android auto-verifies instantly.
+        // We MUST complete the completer here so it doesn't hang!
+        if (!completer.isCompleted) {
+          // We pass a fake verification ID so the routing continues
+          completer.complete('test_auto_verified');
+        }
+      },
       verificationFailed: (FirebaseAuthException e) {
-        completer.completeError(
-          ServerException(e.message ?? 'Verification failed'),
-        );
+        if (!completer.isCompleted) {
+          completer.completeError(
+            ServerException(e.message ?? 'Verification failed'),
+          );
+        }
       },
       codeSent: (String verificationId, int? resendToken) {
-        // Return the ID to our Repository!
-        completer.complete(verificationId);
+        if (!completer.isCompleted) {
+          completer.complete(verificationId);
+        }
       },
-      codeAutoRetrievalTimeout: (String verificationId) {},
+      codeAutoRetrievalTimeout: (String verificationId) {
+        // If Android fails to auto-read the SMS within the timeout,
+        // it still gives us the verificationId so the user can type it manually.
+        if (!completer.isCompleted) {
+          completer.complete(verificationId);
+        }
+      },
     );
     return completer.future;
   }
