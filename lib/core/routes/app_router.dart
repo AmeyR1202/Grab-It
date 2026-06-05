@@ -33,8 +33,7 @@ GoRouter createRouter(AuthBloc authBloc) {
 
     redirect: (context, state) {
       final authState = authBloc.state;
-
-      final location = state.matchedLocation;
+      final location = state.uri.path;
 
       // Global Route Guards
       final isAuthRoute =
@@ -45,15 +44,23 @@ GoRouter createRouter(AuthBloc authBloc) {
 
       // 1. Unauthenticated users should be blocked from accessing protected routes
       if (authState is AuthInitial || authState is AuthFailureState) {
-        return isAuthRoute ? null : '/welcome';
+        final target = isAuthRoute ? null : '/welcome';
+        return target;
       }
 
       // 2. Authenticated users should not be able to go backwards to the login screens
       if (authState is AuthUserExistsState) {
-        final target = authState.user.role == 'owner' ? '/merchant-dashboard' : '/home';
-        return isAuthRoute ? target : null;
+        final target = authState.user.role == 'owner'
+            ? '/merchant-dashboard'
+            : '/home';
+        final redirectTarget = isAuthRoute ? target : null;
+        return redirectTarget;
       }
 
+      // 3. New users navigating to Profile Setup
+      if (authState is AuthUserNewState) {
+        return null;
+      }
       return null;
     },
 
@@ -88,10 +95,7 @@ GoRouter createRouter(AuthBloc authBloc) {
         builder: (context, state) => const ProfileSetupPage(),
       ),
 
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomePage(),
-      ),
+      GoRoute(path: '/home', builder: (context, state) => const HomePage()),
 
       GoRoute(
         path: '/merchant-dashboard',

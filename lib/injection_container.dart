@@ -15,7 +15,7 @@ final sl = GetIt.instance;
 
 Future<void> initDependencies() async {
   // BLoC
-  sl.registerFactory(
+  sl.registerLazySingleton(
     () => AuthBloc(
       sendOtpUsecase: sl(),
       verifyOTPUseCase: sl(),
